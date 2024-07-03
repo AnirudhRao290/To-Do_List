@@ -206,7 +206,7 @@ form button:hover {
   }
 
   form {
-    max-width: 60%;
+    max-width: 50%;
   }
 }
 
@@ -234,7 +234,7 @@ form button:hover {
   }
 
   form {
-    max-width: 80%;
+    max-width: 65%;
     padding: 15px;
   }
 
@@ -268,7 +268,7 @@ form button:hover {
   }
 
   form {
-    max-width: 100%;
+    max-width: 80%;
     padding: 10px;
   }
 
