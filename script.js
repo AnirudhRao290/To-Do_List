@@ -1,190 +1,284 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-let TaskRows     = JSON.parse(localStorage.getItem("tasks")) || [];
-let taskId       = TaskRows.length? Number(TaskRows[TaskRows.length - 1]?.id) + 1 : 1;
-let actionColumn = false;
-let Completed    = true;
-const btnTask    = document.querySelector(".tasks");
-const btnAdd     = document.querySelector(".add");
-const btnEdit    = document.querySelector(".edits");
-const content    = document.querySelector(".Content");
-const form       = document.querySelector(".form");
+body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  background-image: url('https://as1.ftcdn.net/v2/jpg/07/81/39/94/1000_F_781399426_TzeXZ8AKtFkLBZotpY79qudXTedXakYB.jpg');
+  background-size: cover;
+}
 
-const renderTasks = (Tasks) => {
-  const filteredTasks = Tasks.filter(task => task.completed !== true);
-  const RenderTasks=Completed?Tasks:filteredTasks;
-  const btn_text=Completed?'Current Tasks':'All Tasks';
+.container {
+  height:39vh ;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  width: 100%;
+}
 
-  const actionHeader = actionColumn ? "<th>Action</th>" : "";
-  const noTasksRow = `<tr><td colspan="4">No Tasks Found🚫</td></tr>`;
-  const renderTable = RenderTasks.map(
-    (row) => `
-        <tr>
-          <td>${row.id}</td>
-          <td class="${row.completed ? "completed" : ""}">${row.task}</td>
-          <td>${row.name}</td>
-          ${actionColumn? `
-                <td>
-                  <input type="checkbox" class="checkbox" data-id="${row.id}" ${row.completed ? "checked" : ""} >
-                  <button class="edit bn" data-id="${row.id}" ${row.completed ? "disabled" : ""}>Edit</button>
-                  <button class="delete bn" data-id="${row.id}">Delete</button>
-                </td>`
-                  : ""
-      }
-    </tr>`
-  ).join('');
-  content.innerHTML = `
-    <button class="btn incomplete">${btn_text}</button>
-    <h2>${Completed?'All':'Current'} Tasks</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Id</th>
-          <th>Task</th>
-          <th>Name</th>
-          ${actionHeader}
-        </tr> 
-      </thead>
-      <tbody class="taskTableBody">
-        ${RenderTasks.length ? renderTable : noTasksRow}
-      </tbody>
-    </table>`;
+.Content {
+  height:60vh;
+  overflow-y: auto;
+  border-radius: 1%;
+}
 
-  if (actionColumn) {
-    content
-      .querySelector(".taskTableBody")
-      .addEventListener("click", (event) => {
-        const target = event.target;
-        if (target.classList.contains("edit")) {
-          editTask(target.dataset.id);
-        } else if (target.classList.contains("delete")) {
-          deleteTask(target.dataset.id);
-        } else if (target.classList.contains("checkbox")) {
-          toggleTaskCompletion(target.dataset.id,RenderTasks);
-        }
-    });
+header {
+  text-align: center;
+  margin-bottom: 100px;
+}
+
+h1 {
+  font-size: 3em;
+  margin-bottom: 10px;
+  backdrop-filter: blur(1px);
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1em;
+  background-color: #002853;
+  backdrop-filter: blur(100px);
+}
+
+.incomplete {
+  position: absolute;
+}
+
+.incomplete:hover {
+  background-color: #014fa3;
+}
+
+.hov:hover {
+  transform: translateY(-5px);
+  transition: transform 0.2s ease;
+}
+
+.bn:hover {
+  transform: translateY(-2px);
+}
+
+.tasks {
+  background-color: #024fa1;
+}
+
+.add {
+  background-color: #00b2ce;
+}
+
+.edit {
+  background-color: #057c0b;
+  padding: 5px 10px;
+}
+
+.edits {
+  background-color: #057c0b;
+  padding: 5px 10px;
+}
+
+#searchInput {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.delete {
+  background-color: #ac0000;
+  padding: 5px 10px;
+}
+
+.completed {
+  text-decoration: line-through 3px red;
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  top: 5px;
+  right: 4px;
+}
+
+input[type="checkbox"]:hover {
+  transform: scale(120%);
+}
+
+h2 {
+  font-size: 2.5em;
+  display: flex;
+  justify-content: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  backdrop-filter: blur(50px);
+}
+
+thead {
+  background-color: #0050a7;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+tbody {
+  overflow-y: auto;
+  height: calc(100% - 40px);
+}
+
+thead th {
+  padding: 10px;
+  text-align: center;
+}
+
+tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+tbody td {
+  font: 1.1em sans-serif;
+  padding: 10px;
+  text-align: center;
+  border: 1px dotted rgb(219, 133, 52);
+  border-bottom: none;
+  border-top: none;
+}
+
+tbody tr:nth-child(even) {
+  backdrop-filter: blur(100px);
+}
+
+form {
+  max-width: 40%;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+  backdrop-filter: blur(200px);
+  margin-top: 20px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+form input[type="text"] {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+form button {
+  width: 96%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
+/* Media Queries */
+@media (max-width: 1200px) {
+  .container {
+    padding: 10px;
   }
-  const complete = document.querySelector(".incomplete");
-  complete.addEventListener("click", ()=>{
-    Completed=!Completed
-    renderTasks(Tasks)
-  });
-};
 
-const toggleTaskCompletion = (taskId,Tasks) => {
-  const task = TaskRows.find((task) => task.id == taskId);
-  if (!task) return;
-  task.completed = !task.completed;
-  saveTasksToLocalStorage();
-  renderTasks(Tasks);
-};
-
-const inputTasks = (task = { task: "", name: ""}, isEdit = false) => {
-  console.log(task);
-  
-  const html = `
-    <form id="taskForm" class="container form overlay style="background-image: none;">
-      <label for="taskInput">Task:</label>
-      <input type="text" id="taskInput" name="taskInput" value="${task.task}"  required>
-      <br>
-      <label for="nameInput">Name:</label>
-      <input type="text" id="nameInput" name="nameInput" value="${task.name}" required>
-      <button type="submit" class="add">Submit</button>
-    </form>`;
-  content.innerHTML=html;
-
-  document.getElementById("taskForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    document.getElementById("searchInput").value=''
-    if (isEdit) {
-      updateTask(task.id);
-    } else {
-      addTask();
-    }
-  });
-};
-
-const addTask = () => {
-  const taskInput = document.getElementById("taskInput").value.trim();
-  const nameInput = document.getElementById("nameInput").value.trim();
-  const task = {
-    id: taskId++,
-    task: taskInput,
-    name: nameInput,
-  };
-  TaskRows.push(task);
-  saveTasksToLocalStorage();
-  renderTasks(TaskRows);
-};
-
-const editTask = (taskId) => {
-  const taskToEdit = TaskRows.find((task) => task.id == taskId);
-  if (!taskToEdit) return alert("Task not found!");
-  inputTasks(taskToEdit,true)
-};
-const updateTask=(taskId)=>{
-  const taskToEdit = TaskRows.find((task) => task.id == taskId);
-  if (!taskToEdit) return alert("Task not found!");
-  const updatedTask =document.getElementById("taskInput").value.trim();
-  const updatedName = document.getElementById("nameInput").value.trim();
-  if (updatedTask !== null && updatedName !== null) {
-    taskToEdit.task = updatedTask.trim();
-    taskToEdit.name = updatedName.trim();
-    saveTasksToLocalStorage();
-    renderTasks(TaskRows);
-    // toggleActionColumn();
-  }}
-
-
-const deleteTask = (taskId) => {
-  if (confirm("Are you sure you want to delete this task?")) {
-    TaskRows = TaskRows.filter((task) => task.id != taskId);
-    saveTasksToLocalStorage();
-    renderTasks(TaskRows);
-    // toggleActionColumn();
+  form {
+    max-width: 50%;
   }
-};
+}
 
-const saveTasksToLocalStorage = () => {
-  localStorage.setItem("tasks", JSON.stringify(TaskRows));
-};
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2em;
+  }
 
-const toggleActionColumn = () => {
-    actionColumn = !actionColumn;
-    renderTasks(TaskRows);
-};
+  h2 {
+    font-size: 1.8em;
+  }
 
-const filterTasks = () => {
-  const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
-  const filteredTasks = TaskRows.filter(task => task.name.toLowerCase().includes(searchTerm));  
-  renderTasks(filteredTasks);
-};
+  .btn {
+    font-size: 0.9em;
+    padding: 8px 16px;
+  }
 
+  #searchInput {
+    font-size: 14px;
+    padding: 8px;
+  }
 
-btnTask.addEventListener("click",()=>{
-    document.getElementById("searchInput").value=''
-    renderTasks(TaskRows)
-});
-btnEdit.addEventListener("click",()=>{
-  document.getElementById("searchInput").value=''
-  toggleActionColumn()
-});
-btnAdd.addEventListener("click", ()=>inputTasks());
-document.getElementById("searchInput").addEventListener("input", filterTasks);
+  table {
+    font-size: 0.9em;
+  }
 
-window.onbeforeunload = () => {
-  content.querySelector(".taskTableBody").removeEventListener('click');
-  btnTask.removeEventListener("click");
-  btnEdit.removeEventListener("click");
-  btnAdd.removeEventListener("click");
-  document.getElementById("searchInput").removeEventListener("input");
-};
+  form {
+    max-width: 65%;
+    padding: 15px;
+  }
 
-/*
-//Run only this code to add Data to local storage
+  form input[type="text"] {
+    padding: 8px;
+  }
 
-const TaskRows=[{"id":1,"task":"Add Elements","name":"Anirudh","completed":false},{"id":2,"task":"Delete tabs","name":"Chethan","completed":true},{"id":3,"task":"Modify design","name":"Chethan","completed":false},{"id":4,"task":"Complete Assignment","name":"Anirudh","completed":false},{"id":5,"task":"Build Components","name":"Kamal"},{"id":6,"task":"Modify Features","name":"Kamal","completed":true},{"id":7,"task":"Drink Coffee","name":"Anirudh"},{"id":8,"task":"Add Features","name":"Anirudh"},{"id":9,"task":"Test Components","name":"Anirudh"},{"id":10,"task":"Plan new Project","name":"Kamal","completed":false},{"id":11,"task":"sdsdsd","name":"Kamal"}]
-const saveTasksToLocalStorage = () => {
-  localStorage.setItem("tasks", JSON.stringify(TaskRows));
-};
-saveTasksToLocalStorage();
-*/
+  form button {
+    font-size: 0.9em;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  .btn {
+    font-size: 0.8em;
+    padding: 6px 12px;
+  }
+
+  #searchInput {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  form {
+    max-width: 80%;
+    padding: 10px;
+  }
+
+  form input[type="text"] {
+    padding: 6px;
+  }
+
+  form button {
+    font-size: 0.8em;
+    padding: 6px;
+  }
+}
